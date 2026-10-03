@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MediScan</title>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<style>
+:root{--bg:#f6f5f2;--card:#fff;--ink:#14171c;--mute:#5b626c;--line:#dedbd4;--or:#ff5a1f;--orink:#fff;--ok:#0b7a3b;--okbg:#e3f4ea;--wa:#8a5200;--wabg:#fff1d6;--er:#b3261e;--erbg:#fde7e5;--inbg:#eceae5;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101216;--card:#1a1d23;--ink:#f1efe9;--mute:#a4a9b1;--line:#2c3038;--ok:#6fd49a;--okbg:#14301f;--wa:#ffc766;--wabg:#33260c;--er:#ff9a92;--erbg:#3a1714;--inbg:#23262d}}
+:root[data-theme="dark"]{--bg:#101216;--card:#1a1d23;--ink:#f1efe9;--mute:#a4a9b1;--line:#2c3038;--ok:#6fd49a;--okbg:#14301f;--wa:#ffc766;--wabg:#33260c;--er:#ff9a92;--erbg:#3a1714;--inbg:#23262d}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:18px/1.5 "Atkinson Hyperlegible",system-ui,Arial,sans-serif;min-height:100%}
+[hidden]{display:none!important}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;border:2px solid var(--ink);background:var(--card);border-radius:12px;min-height:52px;padding:0 18px;font-weight:700}
+button.p{background:var(--or);border-color:var(--or);color:var(--orink)}
+button.g{border-color:var(--line)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--or);outline-offset:2px}
+input{width:100%;min-height:52px;border:2px solid var(--line);background:var(--card);border-radius:12px;padding:0 14px}
+h1,h2,h3{margin:0;line-height:1.2}
+.wrap{max-width:640px;margin:0 auto;padding:16px}
+.brand{font-weight:700;font-style:italic;font-size:26px;letter-spacing:-.5px}.brand b{color:var(--or)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 16px;max-width:640px;margin:0 auto}
+.top small{color:var(--mute)}
+nav{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:2px solid var(--ink)}
+nav .in{display:flex;max-width:640px;margin:0 auto}
+nav button{flex:1;border:0;border-radius:0;background:none;min-height:56px;border-bottom:5px solid transparent}
+nav button[aria-current=true]{border-bottom-color:var(--or)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0}
+.mute{color:var(--mute)}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1}
+.hero{font-size:30px;font-weight:700;font-style:italic;line-height:1.15;margin:8px 0 6px}
+.big{width:100%;min-height:76px;font-size:22px;margin:12px 0}
+#reader{width:100%;border-radius:12px;overflow:hidden}
+.item{display:flex;gap:14px;align-items:center;width:100%;text-align:left;margin:8px 0;border-color:var(--line);min-height:68px;padding:10px 14px}
+.em{font-size:34px;line-height:1}
+.chip{display:inline-block;padding:2px 10px;border-radius:99px;background:var(--inbg);font-size:15px}
+.alert{display:flex;gap:12px;border-radius:12px;padding:14px;margin:10px 0;font-weight:700;border:2px solid}
+.alert span:last-child{font-weight:400}.alert b{display:block}
+.ok{background:var(--okbg);color:var(--ok);border-color:var(--ok)}
+.wa{background:var(--wabg);color:var(--wa);border-color:var(--wa)}
+.er{background:var(--erbg);color:var(--er);border-color:var(--er)}
+.photo{height:130px;border-radius:12px;background:var(--inbg);display:flex;align-items:center;justify-content:center;font-size:64px;position:relative}
+.photo i{position:absolute;bottom:6px;right:10px;font-size:13px;color:var(--mute);font-style:normal}
+.sec{border-top:1px solid var(--line);padding:12px 0}.sec h3{font-size:19px;margin-bottom:4px}
+.err{color:var(--er);font-weight:700;min-height:24px}
+footer{max-width:640px;margin:0 auto;padding:8px 16px 32px;font-size:14px;color:var(--mute)}
+.tabs{display:flex;gap:8px;margin-bottom:12px}.tabs button{flex:1}.tabs [aria-pressed=true]{background:var(--ink);color:var(--bg)}
+label{display:block;font-weight:700;margin:12px 0 4px}
+</style>
+</head>
+<body>
+
+<div id="auth" class="wrap">
+  <div class="brand" style="font-size:40px">Medi<b>Scan</b></div>
+  <p class="hero">Scan any medicine, know everything.</p>
+  <div class="card">
+    <div class="tabs" role="group" aria-label="Account">
+      <button id="tl" aria-pressed="true" onclick="authMode('login')">Log in</button>
+      <button id="ts" aria-pressed="false" onclick="authMode('signup')">Sign up</button>
+    </div>
+    <label for="un">Username</label><input id="un" autocomplete="username" autocapitalize="none">
+    <label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password">
+    <p id="aerr" class="err" role="alert"></p>
+    <button id="abtn" class="p" style="width:100%" onclick="doAuth()">Log in</button>
+    <button class="g" style="width:100%;margin-top:10px" onclick="enter('guest')">Continue without login</button>
+    <p class="mute" style="font-size:15px">Login is optional. Scan and search work without it. Demo account: username <b>demo</b>, password <b>demo123</b>. Accounts are stored only in this browser (prototype).</p>
+  </div>
+  <p class="mute" style="font-size:14px">MediScan is for information only. Always follow your doctor's or pharmacist's advice.</p>
+</div>
+
+<div id="app" hidden>
+  <div class="top"><div class="brand">Medi<b>Scan</b></div><div><small id="who"></small> <button id="lgBtn" class="g" style="min-height:40px;padding:0 12px" onclick="logout()">Log out</button></div></div>
+  <nav><div class="in">
+    <button data-v="scan" onclick="show('scan')">Scan</button>
+    <button data-v="search" onclick="show('search')">Search</button>
+    <button data-v="saved" onclick="show('saved')">Saved</button>
+  </div></nav>
+  <main class="wrap">
+    <section id="v-scan">
+      <h2>Scan the medicine pack</h2>
+      <p class="mute">Point your camera at the barcode or QR code on the pack.</p>
+      <div id="reader" hidden></div><div id="tmp" hidden></div>
+      <button id="camBtn" class="p big" onclick="startCam()">Open camera</button>
+      <button id="stopBtn" class="big g" onclick="stopCam()" hidden>Stop camera</button>
+      <p id="serr" class="err" role="alert"></p>
+      <div class="card">
+        <h3>No camera, or barcode damaged?</h3>
+        <label for="photo">Upload a photo of the code</label>
+        <input id="photo" type="file" accept="image/*" onchange="fromPhoto(this)">
+        <label for="code">Or type the number under the barcode</label>
+        <div class="row"><input id="code" inputmode="numeric" placeholder="e.g. 8901000000011"><button class="p" style="flex:0 0 auto" onclick="lookup($('code').value)">Check</button></div>
+        <p style="margin:12px 0 0">Or <a href="#" onclick="show('search');return false" style="color:var(--or);font-weight:700">search by medicine name</a>.</p>
+      </div>
+      <div class="card">
+        <h3>Try a demo code</h3>
+        <p class="mute" style="margin:0 0 8px">No pack handy? Tap a code to see how a result looks.</p>
+        <div id="demo" class="row"></div>
+      </div>
+    </section>
+
+    <section id="v-search" hidden>
+      <h2>Search by name</h2>
+      <label for="q">Medicine name</label>
+      <div class="row"><input id="q" placeholder="Any medicine, e.g. Dolo 650" oninput="doSearch()" autocomplete="off"><button class="p" style="flex:0 0 auto" onclick="go()">Search</button></div>
+      <div id="sres" style="margin-top:8px"></div>
+    </section>
+
+    <section id="v-saved" hidden>
+      <h2>Saved medicines</h2>
+      <div id="saved"></div>
+      <h2 style="margin-top:24px">My medicines</h2>
+      <p class="mute">Medicines you take now. MediScan warns you if a new one may clash with them.</p>
+      <div id="mine"></div>
+    </section>
+
+    <section id="v-result" hidden></section>
+  </main>
+  <footer>Demo data and online lookups are not verified medical advice. MediScan is for information only. Always follow your doctor's or pharmacist's advice.<br>Byte Race 2026 · Vivekananda College of Engineering &amp; Technology, Puttur</footer>
+</div>
+
+<script>
+// ---------- storage (try/catch, memory fallback) ----------
+var mem={};
+function sget(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return k in mem?mem[k]:d}}
+function sset(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){mem[k]=v}}
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+
+// ---------- DEMO medicine data (not verified medical information) ----------
+var DB=[
+{c:'8901000000011',n:'Paracetamol 500 mg',g:'paracetamol',m:'Demo Pharma',e:'💊',u:'Fever, headache, body ache, toothache and other mild to moderate pain.',d:'Adults: 1 tablet every 4 to 6 hours if needed. Do not take more than 8 tablets in 24 hours.',s:'Rare at normal doses: nausea or skin rash. Too much can seriously damage the liver.',w:'Do not take other products that also contain paracetamol. Avoid alcohol. Ask a doctor first if you have liver disease.',st:'Store below 30°C in a dry place, away from light and out of reach of children.',x:[]},
+{c:'8901000000028',n:'Ibuprofen 400 mg',g:'ibuprofen',m:'Demo Pharma',e:'💊',u:'Pain, swelling and fever, such as joint pain, period pain and toothache.',d:'Adults: 1 tablet up to 3 times a day, after food. Do not take more than 3 tablets in a day unless a doctor tells you to.',s:'Stomach upset, heartburn, nausea, dizziness.',w:'Not for people with stomach ulcers, kidney disease or NSAID-triggered asthma. Avoid in late pregnancy. Always take with food.',st:'Store below 25°C in a dry place, away from children.',x:[['aspirin','Together they raise the risk of stomach bleeding, and ibuprofen can weaken the heart protection of low-dose aspirin.'],['diclofenac','Both are pain killers of the same type. Do not take them together.']]},
+{c:'8901000000035',n:'Aspirin 75 mg',g:'aspirin',m:'Demo Pharma',e:'❤️',u:'Used on a doctor\'s advice to lower the risk of blood clots, heart attack and stroke.',d:'1 tablet once a day, only as prescribed by your doctor.',s:'Stomach irritation, easy bruising, bleeding.',w:'Do not start on your own. Never give to children under 16. Tell your doctor before any surgery or dental work.',st:'Store below 25°C in a dry place. Keep away from moisture.',x:[['ibuprofen','Together they raise the risk of stomach bleeding, and ibuprofen can weaken the heart protection of aspirin.'],['diclofenac','Together they raise the risk of stomach bleeding.']]},
+{c:'8901000000042',n:'Cetirizine 10 mg',g:'cetirizine',m:'Demo Pharma',e:'🤧',u:'Allergies: sneezing, runny nose, itchy eyes, skin rash and hives.',d:'Adults and children 12 and over: 1 tablet once a day.',s:'Sleepiness, dry mouth, headache.',w:'May make you drowsy. Do not drive or use machines if sleepy. Avoid alcohol. Ask a doctor if you have kidney disease.',st:'Store below 25°C in a dry place.',x:[]},
+{c:'8901000000059',n:'Omeprazole 20 mg',g:'omeprazole',m:'Demo Pharma',e:'🔥',u:'Acidity, heartburn, acid reflux and stomach ulcers.',d:'1 capsule once a day before breakfast. Swallow whole with water.',s:'Headache, nausea, diarrhoea, stomach pain.',w:'Use for a long time only on a doctor\'s advice. See a doctor if you have black stools or trouble swallowing.',st:'Store below 25°C in a dry place, away from light.',x:[]},
+{c:'8901000000066',n:'ORS Powder Sachet',g:'ors',m:'Demo Pharma',e:'💧',u:'Replaces water and salts lost during diarrhoea or vomiting.',d:'Mix 1 sachet in 1 litre of clean drinking water. Sip often. Throw away any mixed drink after 24 hours.',s:'Vomiting if drunk too fast. Sip slowly.',w:'Use exactly 1 litre of water per sachet. See a doctor if diarrhoea lasts more than 2 days, there is blood in the stool or high fever, or for a baby.',st:'Store in a cool, dry place. Do not use if the sachet is damaged.',x:[]},
+{c:'8901000000073',n:'Loperamide 2 mg',g:'loperamide',m:'Demo Pharma',e:'🩹',u:'Short-term relief of loose motions (diarrhoea).',d:'Adults: 2 capsules first, then 1 after each loose stool. Do not go above the daily maximum printed on the pack.',s:'Constipation, bloating, dizziness.',w:'Not for children under 12. Do not use if there is blood in the stool or fever. Drink plenty of fluids.',st:'Store below 25°C in a dry place.',x:[]},
+{c:'8901000000097',n:'M2-Tone (Ayurvedic)',g:'m2-tone herbal',m:'Charak Pharma (brand)',e:'🌿',u:'Ayurvedic herbal medicine traditionally used for menstrual problems such as irregular or painful periods and white discharge.',d:'Follow the dose printed on the pack or advised by your Ayurvedic doctor. It comes as tablets and syrup.',s:'Usually well tolerated. Stop and ask a doctor if you get a rash, vomiting or stomach upset.',w:'Not for use in pregnancy unless your doctor says so. See a doctor if periods stay irregular or bleeding is heavy. Do not use in place of treatment advised by your doctor.',st:'Store in a cool, dry place, away from sunlight and out of reach of children.',x:[]},
+{c:'8901000000080',n:'Diclofenac 50 mg',g:'diclofenac',m:'Demo Pharma',e:'🦴',u:'Pain and swelling, such as joint pain and back pain.',d:'Adults: 1 tablet 2 to 3 times a day after food, only as advised by a doctor or pharmacist. Short-term use.',s:'Stomach pain, nausea, dizziness.',w:'Avoid with heart disease, stomach ulcers or kidney problems. Take after food.',st:'Store below 25°C in a dry place.',x:[['ibuprofen','Both are pain killers of the same type. Do not take them together.'],['aspirin','Together they raise the risk of stomach bleeding.']]}
+];
+var user=null,scanner=null,cur=null,scanned=false;
+
+// ---------- auth (prototype only, stored in this browser) ----------
+var mode='login';
+async function hash(s){try{var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('')}catch(e){return btoa(s)}}
+function authMode(m){mode=m;$('tl').setAttribute('aria-pressed',m=='login');$('ts').setAttribute('aria-pressed',m=='signup');$('abtn').textContent=m=='login'?'Log in':'Create account';$('aerr').textContent=''}
+async function doAuth(){
+  var u=$('un').value.trim().toLowerCase(),p=$('pw').value,users=sget('ms_users',{});
+  if(!users.demo)users.demo=await hash('demo123');
+  if(!u||!p){$('aerr').textContent='Enter a username and password.';return}
+  if(mode=='signup'){
+    if(u.length<3||p.length<4){$('aerr').textContent='Username needs 3+ characters and password 4+.';return}
+    if(users[u]||u=='guest'){$('aerr').textContent='That username is taken. Choose another.';return}
+    users[u]=await hash(p);sset('ms_users',users);
+  }else if(users[u]!==await hash(p)){$('aerr').textContent='Wrong username or password.';sset('ms_users',users);return}
+  sset('ms_users',users);sset('ms_session',u);enter(u);
+}
+function enter(u){user=u;$('auth').hidden=true;$('app').hidden=false;var g=u=='guest';$('who').textContent=g?'Guest':'Hi, '+u;$('lgBtn').textContent=g?'Log in':'Log out';$('lgBtn').onclick=g?openAuth:logout;$('pw').value='';$('aerr').textContent='';
+  $('demo').innerHTML=DB.slice(0,4).map(function(m){return '<button class="g" onclick="lookup(\''+m.c+'\')">'+esc(m.n.split(' ')[0])+'</button>'}).join('')+'<button class="g" onclick="lookup(\'0000000000000\')">Unknown code</button>';
+  show('scan')}
+function openAuth(){stopCam();window.speechSynthesis&&speechSynthesis.cancel();$('app').hidden=true;$('auth').hidden=false}
+function logout(){stopCam();window.speechSynthesis&&speechSynthesis.cancel();sset('ms_session','');enter('guest')}
+
+// ---------- navigation ----------
+function show(v){
+  if(v!='scan')stopCam();
+  ['scan','search','saved','result'].forEach(function(x){$('v-'+x).hidden=x!=v});
+  document.querySelectorAll('nav button').forEach(function(b){b.setAttribute('aria-current',b.dataset.v==v)});
+  if(v=='saved')renderSaved();
+  if(v=='search')doSearch();
+  window.scrollTo(0,0);
+}
+
+// ---------- scanning ----------
+async function startCam(){
+  $('serr').textContent='';
+  if(!window.Html5Qrcode){$('serr').textContent='The scanner could not load. Use the photo upload or type the number below.';return}
+  try{
+    $('reader').hidden=false;$('camBtn').hidden=true;$('stopBtn').hidden=false;
+    scanner=new Html5Qrcode('reader');
+    await scanner.start({facingMode:'environment'},{fps:10,qrbox:{width:260,height:160}},function(t){stopCam();lookup(t)},function(){});
+  }catch(e){stopCam();$('serr').textContent='Camera could not open. Allow camera access in your browser, or use the photo upload or number box below.'}
+}
+async function stopCam(){
+  try{if(scanner){await scanner.stop();scanner.clear()}}catch(e){}
+  scanner=null;$('reader').hidden=true;$('camBtn').hidden=false;$('stopBtn').hidden=true;
+}
+function fromPhoto(inp){
+  var f=inp.files&&inp.files[0];if(!f)return;$('serr').textContent='';
+  if(!window.Html5Qrcode){$('serr').textContent='The scanner could not load. Type the number instead.';return}
+  new Html5Qrcode('tmp').scanFile(f,false).then(function(t){lookup(t)}).catch(function(){$('serr').textContent='No code found in that photo. Try a clearer, closer photo, or type the number.'});
+  inp.value='';
+}
+function lookup(code){
+  code=String(code||'').trim();
+  if(!code){$('serr').textContent='Enter the code number first.';return}
+  var m=DB.find(function(x){return x.c===code});
+  scanned=true;
+  if(m)openMed(m,true);else if(/^\d{8,14}$/.test(code))fdaByCode(code);else notFound(code);
+}
+
+// ---------- search ----------
+function norm(s){return s.toLowerCase().replace(/[^a-z0-9]/g,'')}
+function subseq(q,t){var i=0;for(var j=0;j<t.length&&i<q.length;j++)if(t[j]==q[i])i++;return i==q.length}
+// Indian/common brand -> generic, and generic -> name used in US drug labels
+var BRAND={dolo:'paracetamol',crocin:'paracetamol',calpol:'paracetamol',pacimol:'paracetamol',metacin:'paracetamol',tylenol:'paracetamol',brufen:'ibuprofen',advil:'ibuprofen',motrin:'ibuprofen',cetzine:'cetirizine',okacet:'cetirizine',zyrtec:'cetirizine',allegra:'fexofenadine',montair:'montelukast',singulair:'montelukast',pan:'pantoprazole',pantocid:'pantoprazole',omez:'omeprazole',razo:'rabeprazole',azithral:'azithromycin',zithromax:'azithromycin',augmentin:'amoxicillin',mox:'amoxicillin',ciplox:'ciprofloxacin',ecosprin:'aspirin',disprin:'aspirin',voveran:'diclofenac',voltaren:'diclofenac',glycomet:'metformin',amlokind:'amlodipine',norvasc:'amlodipine',telma:'telmisartan',atorva:'atorvastatin',lipitor:'atorvastatin',thyronorm:'levothyroxine',eltroxin:'levothyroxine',limcee:'ascorbic acid',benadryl:'diphenhydramine',electral:'ors',meftal:'mefenamic acid',flagyl:'metronidazole',zerodol:'aceclofenac',taxim:'cefixime',zifi:'cefixime',cifran:'ciprofloxacin',oflox:'ofloxacin',monocef:'ceftriaxone',cyclopam:'dicyclomine',buscopan:'hyoscine',domstal:'domperidone',ondem:'ondansetron',emeset:'ondansetron',rantac:'ranitidine',zinetac:'ranitidine',aciloc:'ranitidine',pantop:'pantoprazole',nexium:'esomeprazole',nexpro:'esomeprazole',ultracet:'tramadol',lonazep:'clonazepam',alprax:'alprazolam',stamlo:'amlodipine',losar:'losartan',clopilet:'clopidogrel',plavix:'clopidogrel',rosuvas:'rosuvastatin',crestor:'rosuvastatin',glimestar:'glimepiride',amaryl:'glimepiride',januvia:'sitagliptin',galvus:'vildagliptin',asthalin:'albuterol',levolin:'levosalbutamol',avil:'pheniramine',folvite:'folic acid',evion:'vitamin e',shelcal:'calcium carbonate',combiflam:'ibuprofen',sinarest:'paracetamol',saridon:'paracetamol',nise:'nimesulide',norflox:'norfloxacin',dytor:'torsemide',lasix:'furosemide',ativan:'lorazepam'};
+var US={paracetamol:'acetaminophen',salbutamol:'albuterol',adrenaline:'epinephrine',noradrenaline:'norepinephrine',frusemide:'furosemide',lignocaine:'lidocaine',rifampicin:'rifampin',glibenclamide:'glyburide',vitaminc:'ascorbic acid'};
+function resolve(q){var k=norm(q),k2=k.replace(/\d+(mg|mcg|g|ml)?$/,'');return BRAND[k]||BRAND[k2]||(q.replace(/\s*\d+\s*(mg|mcg|g|ml)?\s*$/i,'').trim()||q)}
+function lev(a,b){var m=[],i,j;for(i=0;i<=a.length;i++)m[i]=[i];for(j=0;j<=b.length;j++)m[0][j]=j;for(i=1;i<=a.length;i++)for(j=1;j<=b.length;j++)m[i][j]=Math.min(m[i-1][j]+1,m[i][j-1]+1,m[i-1][j-1]+(a[i-1]==b[j-1]?0:1));return m[a.length][b.length]}
+function fuzzy(k){k=k.replace(/\d+(mg|mcg|g|ml)?$/,'');if(k.length<5)return '';var best='',bd=9,lim=k.length>7?2:1;
+  Object.keys(BRAND).concat(Object.keys(US)).concat(DB.map(function(d){return norm(d.g)})).forEach(function(c){var d=lev(k,c);if(d<bd){bd=d;best=c}});
+  return bd<=lim&&bd>0?(BRAND[best]||best):''}
+function fdaName(g){return US[norm(g)]||g}
+
+function doSearch(){
+  var raw=$('q').value.trim(),q=norm(raw),gq=norm(resolve(raw));
+  var r=DB.filter(function(m){var t=norm(m.n+m.g+(m.b||'')),t2=norm(m.u);return !q||t.indexOf(q)>-1||(gq&&t.indexOf(gq)>-1)||(q.length>=4&&t2.indexOf(q)>-1)||(q.length>=4&&subseq(q,norm(m.n)))});
+  var h=r.map(function(m){return '<button class="item" onclick="openByCode(\''+m.c+'\')"><span class="em">'+m.e+'</span><span><b>'+esc(m.n)+'</b><br><span class="mute" style="font-size:15px">'+esc(m.u.slice(0,60))+'…</span></span></button>'}).join('');
+  if(!r.length&&raw)h='<p class="card">Press <b>Search</b> to look up “'+esc(raw)+'” in the drug database.</p>';
+  if(raw.length>=2&&r.length)h+='<div class="card"><b>Looking for something else?</b><p class="mute" style="margin:4px 0 10px">Search the full drug database.</p><button class="p" onclick="lookupRemote()">Search database for “'+esc(raw)+'”</button></div>';
+  $('sres').innerHTML=h;return r.length;
+}
+function go(){var q=$('q').value.trim();if(q.length<2)return;if(!doSearch())lookupRemote()}
+function byCode(c){return DB.find(function(x){return x.c===c})||sget('ms_ai',{})[c]}
+function same(a,b){a=norm(String(a));b=norm(String(b));return a&&b&&(a==b||a.indexOf(b)>-1||b.indexOf(a)>-1)}
+
+// ---------- openFDA drug label lookup (works when hosted on GitHub Pages) ----------
+async function fda(search){
+  var r=await fetch('https://api.fda.gov/drug/label.json?limit=5&search='+encodeURIComponent(search));
+  if(r.status==404)return [];
+  if(!r.ok)throw new Error('fda '+r.status);
+  var j=await r.json();return j.results||[];
+}
+function clip(x,n){
+  if(!x)return 'Not stated on the label. Ask your pharmacist.';
+  var t=(Array.isArray(x)?x.join(' '):String(x)).replace(/\s+/g,' ').trim();
+  t=t.replace(/^(\d+(\.\d+)?\s*)?(INDICATIONS\s*(AND|&)\s*USAGE|DOSAGE\s*AND\s*ADMINISTRATION|ADVERSE REACTIONS|WARNINGS(\s*AND\s*PRECAUTIONS)?|DRUG INTERACTIONS|STORAGE AND HANDLING|HOW SUPPLIED|Uses|Purpose|Directions|Warnings|Do not use|Stop use and ask a doctor if)\s*:?\s*/i,'');
+  if(t.length>n){var c=t.slice(0,n),k=Math.max(c.lastIndexOf('. '),c.lastIndexOf('; '));t=(k>n*.5?c.slice(0,k+1):c.replace(/\s\S*$/,''))+' …'}
+  return t||'Not stated on the label. Ask your pharmacist.';
+}
+function toMed(l,name){
+  var o=l.openfda||{},nm=(o.brand_name&&o.brand_name[0])||name,g=((o.generic_name&&o.generic_name[0])||(o.substance_name&&o.substance_name[0])||nm).toLowerCase();
+  return {c:'fda:'+norm(nm+g),n:nm,g:g,m:(o.manufacturer_name&&o.manufacturer_name[0])||'Drug label',e:'💊',
+    u:clip(l.indications_and_usage||l.purpose||l.uses,450),d:clip(l.dosage_and_administration,450),s:clip(l.adverse_reactions||l.stop_use||l.ask_doctor,450),
+    w:clip(l.boxed_warning||l.warnings||l.warnings_and_cautions||l.do_not_use,500),st:clip(l.storage_and_handling||l.how_supplied,250),
+    x:[],xi:l.drug_interactions?clip(l.drug_interactions,500):'',ai:true,src:'fda'};
+}
+function remember(m){var c=sget('ms_ai',{});c[m.c]=m;sset('ms_ai',c)}
+async function wiki(q){
+  var r=await fetch('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrlimit=1&prop=extracts%7Cpageimages&exintro=1&explaintext=1&exsentences=4&piprop=thumbnail&pithumbsize=300&gsrsearch='+encodeURIComponent(q+' medication'));
+  var j=await r.json(),pg=j.query&&j.query.pages;if(!pg)return null;
+  var p=pg[Object.keys(pg)[0]],ex=(p.extract||'').replace(/\s+/g,' ').trim(),key=norm(resolve(q).split(' ')[0]);
+  if(!ex||!/medic|drug|tablet|capsule|analgesic|antibiotic|pharmaceutical|brand name|used to treat|used for/i.test(ex)||norm(ex+p.title).indexOf(key)<0)return null;
+  var NA='Not available from this source. Follow the pack label or ask your pharmacist.';
+  return {c:'wiki:'+norm(p.title),n:p.title,g:p.title.toLowerCase(),m:'Wikipedia',e:'💊',u:ex,d:NA,s:NA,w:NA,st:NA,x:[],ai:true,src:'wiki',img:(p.thumbnail&&p.thumbnail.source)||''};
+}
+async function aiLookup(q){
+  var sm=window.claude&&await claude.use('sample');if(!sm)return null;
+  var r=await sm.json('You are a medicine information assistant inside a hackathon app. The user typed this medicine name: "'+q+'". If it is a real, recognisable medicine (generic or common brand name), answer with JSON only: {"found":true,"name":"","generic":"generic name in lowercase","uses":"","dosage":"usual adult dose","side_effects":"","warnings":"","storage":"","interactions":[{"with":"generic name in lowercase","note":""}]}. Use plain words an elderly person can follow, and keep each field under 40 words. If it is not a medicine, or you are not sure it exists, answer {"found":false}. Never invent a medicine.');
+  if(!r||!r.found)return null;
+  function t(v){return String(v||'Not available. Ask your pharmacist.')}
+  return {c:'ai:'+norm(r.name||q),n:t(r.name||q),g:t(r.generic||r.name||q).toLowerCase(),m:'AI summary',e:'💊',u:t(r.uses),d:t(r.dosage),s:t(r.side_effects),w:t(r.warnings),st:t(r.storage),x:(Array.isArray(r.interactions)?r.interactions:[]).slice(0,6).map(function(i){return [t(i.with).toLowerCase(),t(i.note)]}),ai:true,src:'ai'};
+}
+async function lookupRemote(q,box,orig){
+  q=(q||$('q').value).replace(/["\\]/g,'').trim();box=box||$('sres');var k=norm(q),gk=norm(resolve(q));if(q.length<2)return;
+  var cache=sget('ms_ai',{}),hit=Object.keys(cache).map(function(i){return cache[i]}).find(function(m){return norm(m.n)==k||norm(m.g)==k||norm(m.g)==gk});
+  if(hit){scanned=false;openMed(hit,false);return true}
+  box.innerHTML='<p class="card">Searching the drug database for “'+esc(q)+'”…</p>';
+  var net=false,m=null,f=fdaName(resolve(q)).replace(/["\\]/g,'');
+  function one(t){return 'openfda.brand_name:"'+t+'" OR openfda.generic_name:"'+t+'" OR openfda.substance_name:"'+t+'"'}
+  try{
+    var res=await fda(one(f));
+    if(!res.length&&f.toLowerCase()!=q.toLowerCase())res=await fda(one(q));
+    if(!res.length&&/^[a-z]+$/i.test(f)){var w=f.toLowerCase();res=await fda('openfda.brand_name:'+w+'* OR openfda.generic_name:'+w+'*')}
+    var l=res.find(function(x){return x.indications_and_usage||x.purpose})||res[0];
+    if(l)m=toMed(l,q);
+  }catch(e){net=true}
+  if(!m){try{m=await wiki(q);if(m)net=false}catch(e){}}
+  if(!m){try{m=await aiLookup(q)}catch(e){}}
+  if(!m&&!orig){var fz=fuzzy(k);if(fz&&norm(fz)!=k){return lookupRemote(fz,box,q)}}
+  if(m){remember(m);m=Object.assign({},m,orig?{fix:orig}:{});scanned=false;openMed(m,false);return true}
+  box.innerHTML='<p class="card">'+'Could not find “'+esc(orig||q)+'”. Check the spelling, or try the generic (ingredient) name. Local, herbal and Ayurvedic brands are often missing from online drug databases.'+(net?' Online drug databases are blocked or unreachable from this page (they are blocked inside the Claude preview but work on a GitHub-hosted page), so only the built-in list was searched.':'')+'</p>';
+  return false;
+}
+async function fdaByCode(code){
+  scanned=false;$('v-result').innerHTML='<div id="rbox"><p class="card">Checking the drug database…</p></div>';show('result');
+  try{
+    var c1=code.replace(/^0+/,''),res=await fda('openfda.upc:"'+code+'" OR openfda.upc:"'+c1+'"');
+    if(res[0]){var m=toMed(res[0],code);remember(m);openMed(m,false);return}
+  }catch(e){}
+  try{var r=await fetch('https://world.openproductsfacts.org/api/v2/product/'+code+'.json?fields=product_name');var j=await r.json();
+    if(j&&j.status==1&&j.product&&j.product.product_name&&await lookupRemote(j.product.product_name,$('rbox')))return}catch(e){}
+  notFound(code);
+}
+function openByCode(c){scanned=false;openMed(byCode(c),false)}
+
+// ---------- result ----------
+function mine(){return sget('ms_mine_'+user,[])}
+function saved(){return sget('ms_saved_'+user,[])}
+function notFound(code){
+  cur=null;var nm=/^[\d\s-]+$/.test(code)?'':code;
+  $('v-result').innerHTML='<button class="g" onclick="show(\'scan\')">‹ Back</button>'+
+  '<div class="alert er" style="margin-top:14px"><span aria-hidden="true">⚠️</span><span><b>Not verified</b>The code “'+esc(code)+'” is not in the MediScan database, so we cannot confirm this pack is genuine. A barcode number alone does not tell us the medicine name.</span></div>'+
+  '<div class="card"><h3>Still see the medicine details</h3><p class="mute">Type the medicine name printed on the pack.</p><label for="nm">Medicine name</label><input id="nm" value="'+esc(nm)+'" placeholder="e.g. Dolo 650" onkeydown="if(event.key==\'Enter\')lookupRemote($(\'nm\').value,$(\'nres\'))"><button class="p" style="width:100%;margin-top:10px" onclick="lookupRemote($(\'nm\').value,$(\'nres\'))">Show details</button><div id="nres" style="margin-top:8px"></div></div>';
+  show('result');
+}
+function openMed(m,sc){
+  cur=m;scanned=sc;
+  var inSaved=saved().indexOf(m.c)>-1,inMine=mine().indexOf(m.c)>-1;
+  $('v-result').innerHTML=
+  '<button class="g" onclick="back()">‹ Back</button>'+
+  '<h2 style="margin:14px 0 4px;font-size:28px">'+esc(m.n)+'</h2>'+
+  '<div class="mute">'+esc(m.g)+' · '+esc(m.m)+'</div>'+
+  (m.ai?'<div class="alert wa"><span aria-hidden="true">🤖</span><span>'+(m.src=='wiki'?'<b>General information only (Wikipedia)</b>This source has no dosage or safety details. Follow the pack label or ask a pharmacist.':m.src=='fda'?'<b>From an official drug label (openFDA)</b>Wording comes from the US label and may differ from your pack. Confirm with a pharmacist or doctor before use.':'<b>AI summary, not verified</b>This was written by AI, not taken from a checked drug database. Confirm with a pharmacist or doctor before use.')+'</span></div>':sc?'<div class="alert ok"><span aria-hidden="true">✅</span><span><b>Verified</b>This code matches a medicine in the MediScan database.</span></div>'
+     :'<div class="alert wa"><span aria-hidden="true">ℹ️</span><span><b>Found by name</b>Scan the pack\'s code to check it is genuine.</span></div>')+
+  (m.fix?'<div class="alert wa"><span aria-hidden="true">🔎</span><span><b>Showing results for “'+esc(m.n)+'”</b>You typed “'+esc(m.fix)+'”. Check this is the medicine you meant.</span></div>':'')+
+  '<div id="alerts"></div>'+
+  (m.img?'<div class="photo"><img src="'+esc(m.img)+'" alt="'+esc(m.n)+'" style="max-height:100%;max-width:100%" onerror="this.parentNode.innerHTML=\'💊\'"></div>':'<div class="photo" aria-hidden="true">'+m.e+'<i>'+(m.ai?'No photo':'Demo image')+'</i></div>')+
+  '<div class="row" style="margin:12px 0"><button class="p" id="lis" onclick="listen()">🔊 Listen</button><button onclick="toggle(\'saved\')">'+(inSaved?'✓ Saved':'Save')+'</button><button onclick="toggle(\'mine\')">'+(inMine?'✓ In my medicines':'I take this')+'</button></div>'+
+  '<div class="card"><label for="exp" style="margin-top:0">Expiry date on the pack</label><input id="exp" type="date" onchange="checkExp()"><div id="expr"></div></div>'+
+  '<div class="card">'+sec('Uses',m.u)+sec('Dosage',m.d)+sec('Side effects',m.s)+sec('Warnings',m.w)+
+  (m.xi?sec('Interactions',m.xi):m.x.length?'<div class="sec"><h3>Interactions</h3>'+m.x.map(function(i){return '<p style="margin:4px 0"><b>With '+esc(i[0])+':</b> '+esc(i[1])+'</p>'}).join('')+'</div>':'<div class="sec"><h3>Interactions</h3><p style="margin:0">No clashes with the other demo medicines. Still tell your doctor about everything you take.</p></div>')+
+  sec('Storage',m.st)+'</div>'+
+  '<p class="mute" style="font-size:15px">Demo data, not medical advice. MediScan is for information only. Always follow your doctor\'s or pharmacist\'s advice.</p>';
+  // interaction alerts against "my medicines"
+  var hit=m.x.filter(function(i){return mine().some(function(c){var o=byCode(c);return o&&same(o.g,i[0])})});
+  if(m.xi)mine().forEach(function(c){var o=byCode(c);if(o&&o.g.length>3&&norm(m.xi).indexOf(norm(o.g))>-1)hit.push([o.g,'The label mentions '+o.g+' in its interactions section.'])});
+  $('alerts').innerHTML=hit.map(function(i){return '<div class="alert er"><span aria-hidden="true">⛔</span><span><b>May clash with '+esc(i[0])+', which you take</b>'+esc(i[1])+' Ask your doctor or pharmacist before taking both.</span></div>'}).join('')+
+  '<div class="alert wa"><span aria-hidden="true">⚠️</span><span><b>Read the warnings before you take it</b>Do not go above the dose shown. Ask a doctor or pharmacist if unsure.</span></div>';
+  show('result');
+}
+function sec(t,x){return '<div class="sec"><h3>'+t+'</h3><p style="margin:0">'+esc(x)+'</p></div>'}
+function back(){window.speechSynthesis&&speechSynthesis.cancel();show(scanned?'scan':'search')}
+function checkExp(){
+  var v=$('exp').value,o=$('expr');if(!v){o.innerHTML='';return}
+  var days=Math.floor((new Date(v+'T23:59:59')-new Date())/864e5);
+  o.innerHTML=days<0?'<div class="alert er"><span aria-hidden="true">⛔</span><span><b>Expired</b>Do not use this medicine. Return it to a pharmacy.</span></div>'
+   :days<=30?'<div class="alert wa"><span aria-hidden="true">⏳</span><span><b>Expiring soon</b>It expires in '+days+' day'+(days==1?'':'s')+'. Use it soon or replace it.</span></div>'
+   :'<div class="alert ok"><span aria-hidden="true">✅</span><span><b>Not expired</b>This pack is within its expiry date.</span></div>';
+}
+function toggle(kind){
+  var k='ms_'+kind+'_'+user,a=sget(k,[]),i=a.indexOf(cur.c);
+  if(i>-1)a.splice(i,1);else a.push(cur.c);
+  sset(k,a);var e=$('exp')?$('exp').value:'';openMed(cur,scanned);if(e){$('exp').value=e;checkExp()}
+}
+function listen(){
+  if(!window.speechSynthesis){alert('Voice read-out is not supported on this browser.');return}
+  var s=speechSynthesis;if(s.speaking){s.cancel();$('lis').textContent='🔊 Listen';return}
+  var m=cur,u=new SpeechSynthesisUtterance(m.n+'. Uses: '+m.u+' Dosage: '+m.d+' Side effects: '+m.s+' Warnings: '+m.w+' Storage: '+m.st);
+  u.rate=.9;u.onend=function(){if($('lis'))$('lis').textContent='🔊 Listen'};
+  $('lis').textContent='⏹ Stop';s.speak(u);
+}
+
+// ---------- saved ----------
+function renderSaved(){
+  function list(codes,k,empty){
+    return codes.length?codes.map(function(c){var m=byCode(c);return m?'<div class="row" style="align-items:stretch"><button class="item" style="flex:3" onclick="openByCode(\''+c+'\')"><span class="em">'+m.e+'</span><b>'+esc(m.n)+'</b></button><button class="g" style="flex:1;margin:8px 0" aria-label="Remove '+esc(m.n)+'" onclick="rm(\''+k+'\',\''+c+'\')">Remove</button></div>':''}).join(''):'<p class="card mute">'+empty+'</p>';
+  }
+  $('saved').innerHTML=list(saved(),'saved','Nothing saved yet. Open a medicine and tap Save.');
+  $('mine').innerHTML=list(mine(),'mine','Empty. Open a medicine you take and tap “I take this”.');
+}
+function rm(kind,c){var k='ms_'+kind+'_'+user,a=sget(k,[]);sset(k,a.filter(function(x){return x!=c}));renderSaved()}
+
+
+// ---------- built-in database: common medicines (works offline, no internet needed) ----------
+// name|generic|brands|uses|dosage|side effects|warnings
+var MORE=`Paracetamol 650 mg|paracetamol|Dolo 650, Dolo, Crocin 650|Fever and mild to moderate pain.|Adults: 1 tablet every 6 hours if needed. No more than 4 tablets in 24 hours.|Rare: nausea, rash. Too much can damage the liver.|Do not take other products that contain paracetamol. Avoid alcohol. Ask a doctor first if you have liver disease.
+Ibuprofen + Paracetamol|ibuprofen and paracetamol|Combiflam|Pain, swelling and fever, such as headache, toothache, body ache.|Adults: 1 tablet up to 3 times a day after food. Do not take more than 3 tablets in a day.|Stomach upset, heartburn, dizziness.|Avoid with stomach ulcers, kidney disease or asthma triggered by pain killers. Always take after food.
+Naproxen 250 mg|naproxen|Naprosyn|Pain, joint pain, period pain and swelling.|Adults: 1 tablet twice a day after food, as advised by a doctor.|Stomach upset, heartburn, dizziness.|Avoid with stomach ulcers, kidney or heart disease. Take after food.
+Aceclofenac 100 mg|aceclofenac|Zerodol, Hifenac|Pain and swelling in joints, back and muscles.|Adults: 1 tablet twice a day after food, for a short time only, as advised by a doctor.|Stomach pain, nausea, dizziness.|Avoid with stomach ulcers, heart or kidney problems. Take after food.
+Mefenamic acid 500 mg|mefenamic acid|Meftal|Period pain, toothache and fever.|Adults: 1 tablet up to 3 times a day after food, for no more than 7 days.|Stomach upset, diarrhoea, drowsiness.|Not for people with stomach ulcers or kidney disease. Take after food.
+Nimesulide 100 mg|nimesulide|Nise|Short-term pain and fever.|Adults: 1 tablet twice a day after food, for a few days only, as advised by a doctor.|Stomach upset, nausea. It can harm the liver.|Avoid with liver disease or alcohol. Not for children under 12. Use for a short time only.
+Levocetirizine 5 mg|levocetirizine|Levocet, Xyzal|Allergy: sneezing, runny nose, itchy eyes, hives.|Adults: 1 tablet once a day, at night.|Sleepiness, dry mouth, tiredness.|May cause drowsiness. Do not drive if sleepy. Avoid alcohol.
+Fexofenadine 120 mg|fexofenadine|Allegra|Allergy: sneezing, runny nose, itchy eyes, hives.|Adults: 1 tablet once a day.|Headache, dizziness, nausea.|Do not take with fruit juice or antacids at the same time.
+Chlorpheniramine 4 mg|chlorpheniramine|Piriton|Cold and allergy symptoms: sneezing and runny nose.|Adults: 1 tablet every 4 to 6 hours. No more than 6 tablets in 24 hours.|Strong drowsiness, dry mouth.|Causes sleepiness. Do not drive. Avoid alcohol.
+Diphenhydramine 25 mg|diphenhydramine|Benadryl|Allergy, cold symptoms and short-term sleep trouble.|Adults: 1 to 2 tablets every 4 to 6 hours if needed.|Strong drowsiness, dry mouth, blurred vision.|Do not drive. Avoid alcohol. Older people should ask a doctor first.
+Montelukast 10 mg|montelukast|Montair, Singulair|Prevents asthma attacks and allergic nose symptoms.|Prescription medicine. Usually 1 tablet in the evening, as prescribed.|Headache, stomach pain. Rarely mood changes.|Not for sudden asthma attacks. Tell a doctor about mood or sleep changes.
+Salbutamol inhaler|salbutamol|Asthalin, Ventolin|Quick relief from wheeze and breathlessness in asthma.|Prescription medicine. Usually 1 to 2 puffs when needed, as prescribed.|Shaky hands, fast heartbeat, headache.|If you need it more often than usual, see a doctor soon.
+Ambroxol 30 mg|ambroxol|Ambrodil|Cough with thick phlegm.|Adults: 1 tablet 3 times a day after food.|Nausea, stomach upset.|See a doctor if cough lasts more than a week.
+Pantoprazole 40 mg|pantoprazole|Pan, Pantocid, Pantop|Acidity, reflux and stomach ulcers.|Adults: 1 tablet once a day, 30 minutes before breakfast. Swallow whole.|Headache, diarrhoea, nausea.|Long-term use only on a doctor's advice. See a doctor for black stools or trouble swallowing.
+Rabeprazole 20 mg|rabeprazole|Razo, Rabium|Acidity, reflux and stomach ulcers.|Adults: 1 tablet once a day before breakfast. Swallow whole.|Headache, diarrhoea, nausea.|Long-term use only on a doctor's advice.
+Esomeprazole 40 mg|esomeprazole|Nexpro, Nexium|Acidity, reflux and stomach ulcers.|Adults: 1 tablet once a day before breakfast. Swallow whole.|Headache, diarrhoea, nausea.|Long-term use only on a doctor's advice.
+Famotidine 20 mg|famotidine|Famocid|Acidity and heartburn.|Adults: 1 tablet twice a day, or 1 at bedtime.|Headache, dizziness, constipation.|Ask a doctor if you have kidney disease.
+Domperidone 10 mg|domperidone|Domstal|Nausea, vomiting and bloating.|Adults: 1 tablet up to 3 times a day, 15 to 30 minutes before food, for a short time.|Dry mouth, headache. Rarely heart rhythm changes.|Not for people with heart rhythm problems. Use for a short time only.
+Ondansetron 4 mg|ondansetron|Ondem, Emeset|Prevents and treats nausea and vomiting.|Prescription medicine. Usually 1 tablet 2 to 3 times a day, as prescribed.|Headache, constipation, tiredness.|Tell the doctor about heart rhythm problems.
+Dicyclomine 10 mg|dicyclomine|Cyclopam, Colimex|Stomach cramps and spasms.|Adults: 1 tablet up to 3 times a day.|Dry mouth, dizziness, blurred vision.|Not for people with glaucoma. Do not drive if dizzy.
+Hyoscine butylbromide 10 mg|hyoscine|Buscopan|Stomach cramps and spasms.|Adults: 1 to 2 tablets up to 3 times a day.|Dry mouth, fast heartbeat, blurred vision.|Not for people with glaucoma. See a doctor if pain is severe or lasts more than a day.
+Bisacodyl 5 mg|bisacodyl|Dulcolax|Constipation.|Adults: 1 to 2 tablets at night.|Stomach cramps, loose stools.|Do not use for a long time. Drink plenty of water.
+Antacid (aluminium + magnesium)|antacid|Digene, Gelusil, Mucaine|Acidity, heartburn and gas.|Adults: chew 1 to 2 tablets, or 10 ml of liquid, after meals and at bedtime.|Constipation or loose stools.|Take 2 hours apart from other medicines. See a doctor if you need it every day.
+Metronidazole 400 mg|metronidazole|Flagyl|Infections such as amoebiasis, giardia and some bacterial infections.|Prescription medicine. Dose and number of days are set by the doctor.|Metallic taste, nausea, headache.|Do not drink alcohol during the course and for 48 hours after.
+Amoxicillin 500 mg|amoxicillin|Mox, Novamox|Bacterial infections of the chest, ear, throat and urine.|Prescription medicine. Take exactly as prescribed and finish the course.|Diarrhoea, nausea, rash.|Tell the doctor if you are allergic to penicillin. Get help at once for swelling or trouble breathing.
+Amoxicillin + Clavulanic acid 625 mg|amoxicillin and clavulanate|Augmentin, Clavam, Moxclav|Bacterial infections of the chest, ear, throat, skin and urine.|Prescription medicine. Take with food, exactly as prescribed, and finish the course.|Diarrhoea, nausea, rash.|Tell the doctor if you are allergic to penicillin. Get help at once for swelling or trouble breathing.
+Azithromycin 500 mg|azithromycin|Azithral, Zithromax|Chest, throat, ear and skin infections.|Prescription medicine. Often 1 tablet a day for 3 days, as prescribed.|Diarrhoea, nausea, stomach pain.|Tell the doctor about heart rhythm problems. Finish the course.
+Ciprofloxacin 500 mg|ciprofloxacin|Ciplox, Cifran|Urinary, stomach and chest infections.|Prescription medicine. Take exactly as prescribed.|Nausea, diarrhoea, dizziness.|Stop and see a doctor if you get tendon pain. Not for children. Keep 2 hours apart from antacids and calcium.
+Cefixime 200 mg|cefixime|Taxim-O, Zifi|Throat, chest, ear and urine infections.|Prescription medicine. Take exactly as prescribed and finish the course.|Diarrhoea, stomach pain, nausea.|Tell the doctor if you are allergic to penicillin or similar antibiotics.
+Doxycycline 100 mg|doxycycline|Doxt, Doxy-1|Infections, acne and some tropical fevers.|Prescription medicine. Take after food with a full glass of water and stay upright for 30 minutes.|Nausea, sun sensitivity, throat irritation.|Avoid strong sun. Not for children under 8 or in pregnancy.
+Metformin 500 mg|metformin|Glycomet, Glucophage|Type 2 diabetes.|Prescription medicine. Usually taken with or after meals, as prescribed.|Nausea, diarrhoea, metallic taste.|Get help for severe stomach pain, fast breathing or unusual tiredness. Tell the doctor before surgery or scans with dye.
+Glimepiride 2 mg|glimepiride|Amaryl, Glimestar|Type 2 diabetes.|Prescription medicine. Usually taken with breakfast, as prescribed.|Low blood sugar (shaky, sweaty, hungry), weight gain.|Eat on time and keep sugar with you. Do not skip meals.
+Amlodipine 5 mg|amlodipine|Amlokind, Stamlo, Norvasc|High blood pressure and chest pain (angina).|Prescription medicine. Usually 1 tablet once a day, as prescribed.|Swollen ankles, flushing, headache, dizziness.|Do not stop suddenly. Stand up slowly.
+Losartan 50 mg|losartan|Losar, Cozaar|High blood pressure and kidney protection in diabetes.|Prescription medicine. Usually 1 tablet once a day, as prescribed.|Dizziness, tiredness, high potassium.|Not for use in pregnancy. Do not stop on your own.
+Telmisartan 40 mg|telmisartan|Telma|High blood pressure.|Prescription medicine. Usually 1 tablet once a day, as prescribed.|Dizziness, back pain, high potassium.|Not for use in pregnancy. Do not stop on your own.
+Atenolol 50 mg|atenolol|Tenormin, Aten|High blood pressure, chest pain and fast heart rate.|Prescription medicine. Usually once a day, as prescribed.|Slow heartbeat, tiredness, cold hands.|Do not stop suddenly. It can hide the signs of low blood sugar.
+Metoprolol 50 mg|metoprolol|Metolar, Betaloc|High blood pressure, chest pain and fast heart rate.|Prescription medicine. Dose is set by the doctor.|Slow heartbeat, tiredness, dizziness.|Do not stop suddenly. It can hide the signs of low blood sugar.
+Atorvastatin 20 mg|atorvastatin|Atorva, Lipitor|High cholesterol. Lowers the risk of heart attack.|Prescription medicine. Usually once a day, as prescribed.|Muscle pain, stomach upset.|Tell the doctor about unexplained muscle pain or weakness. Not for use in pregnancy.
+Rosuvastatin 10 mg|rosuvastatin|Rosuvas, Crestor|High cholesterol. Lowers the risk of heart attack.|Prescription medicine. Usually once a day, as prescribed.|Muscle pain, headache, stomach upset.|Tell the doctor about unexplained muscle pain. Not for use in pregnancy.
+Clopidogrel 75 mg|clopidogrel|Clopilet, Plavix|Prevents blood clots after a heart attack, stroke or stent.|Prescription medicine. Usually 1 tablet once a day.|Bleeding, easy bruising.|Do not stop on your own. Tell the doctor or dentist before any surgery.
+Warfarin|warfarin|Warf, Coumadin|Prevents and treats blood clots.|Prescription medicine. Dose is changed by the doctor after blood tests (INR).|Bleeding, bruising.|Many medicines and foods change its effect. Never start a new medicine without asking your doctor.
+Furosemide 40 mg|furosemide|Lasix|Swelling from heart, liver or kidney problems, and high blood pressure.|Prescription medicine. Dose is set by the doctor, usually in the morning.|Passing a lot of urine, dizziness, low potassium.|Drink and eat as advised. Stand up slowly.
+Levothyroxine 50 mcg|levothyroxine|Thyronorm, Eltroxin|Underactive thyroid.|Prescription medicine. Once a day on an empty stomach, 30 to 60 minutes before breakfast.|At the right dose, few. Too much causes palpitations and sweating.|Take at the same time every day. Keep 4 hours apart from calcium and iron.
+Prednisolone 10 mg|prednisolone|Wysolone, Omnacortil|Swelling, allergy, asthma flare-ups and some autoimmune diseases.|Prescription medicine. Dose and number of days are set by the doctor.|Increased appetite, mood changes, high blood sugar, stomach upset.|Take after food. Do not stop suddenly after long use. Raises blood sugar.
+Vitamin C 500 mg|vitamin c|Limcee, Celin|Vitamin C deficiency.|Adults: 1 tablet a day.|Stomach upset or loose stools in high doses.|Very high doses over a long time may cause kidney stones.
+Vitamin D3 60000 IU|vitamin d3|Calcirol, D-Rise, Uprise D3|Vitamin D deficiency.|Usually 1 sachet or capsule once a week for a few weeks, as advised by a doctor.|Nausea and constipation if too much is taken.|Do not take extra. A blood test helps the doctor set the dose.
+Calcium + Vitamin D3|calcium carbonate|Shelcal, Calcimax|Bone health and calcium deficiency.|Adults: 1 tablet once or twice a day after food.|Constipation, gas.|Keep 4 hours apart from thyroid medicine and some antibiotics.
+Folic acid 5 mg|folic acid|Folvite|Anaemia from low folate, and before and during pregnancy.|Adults: 1 tablet a day, as advised.|Nausea, bloating.|Tell the doctor if you take epilepsy medicines.
+Iron + Folic acid|ferrous ascorbate|Orofer, Fefol|Iron-deficiency anaemia.|Adults: 1 tablet a day after food, as advised.|Dark stools, constipation, nausea.|Keep away from children. Iron overdose is dangerous.
+Albendazole 400 mg|albendazole|Zentel, Bandy|Worm infections.|Adults: one 400 mg tablet once, with food, as advised.|Stomach pain, nausea, headache.|Not for use in pregnancy.
+Fluconazole 150 mg|fluconazole|Zocon, Forcan|Fungal infections, including vaginal thrush.|Prescription medicine. Often a single 150 mg dose, as prescribed.|Nausea, headache, stomach pain.|Tell the doctor about liver disease and other medicines you take.
+Clotrimazole cream|clotrimazole|Candid|Fungal skin infections such as ringworm and athlete's foot.|Apply a thin layer to clean, dry skin 2 to 3 times a day for 2 to 4 weeks.|Local redness or irritation.|Stop if irritation gets worse. Do not use in the eyes.
+Levonorgestrel 1.5 mg|levonorgestrel|i-Pill, Unwanted 72|Emergency contraception after unprotected sex.|1 tablet as soon as possible, within 72 hours of unprotected sex.|Nausea, headache, changes in the next period.|Not for regular use. See a doctor if your period is more than a week late.`;
+var GROUPS=[[['ibuprofen','diclofenac','aspirin','naproxen','aceclofenac','mefenamic acid','nimesulide','ibuprofen and paracetamol'],'Pain killers of the same type. Taking two together raises the risk of stomach bleeding and kidney harm.'],[['warfarin','clopidogrel','aspirin','ibuprofen','diclofenac','naproxen','aceclofenac','mefenamic acid','nimesulide','ibuprofen and paracetamol'],'Together they raise the risk of bleeding.']];
+var PAIRS=[['clopidogrel','omeprazole','Omeprazole may weaken the effect of clopidogrel.'],['clopidogrel','esomeprazole','Esomeprazole may weaken the effect of clopidogrel.'],['levothyroxine','calcium carbonate','Calcium can block thyroid medicine. Take them 4 hours apart.'],['levothyroxine','ferrous ascorbate','Iron can block thyroid medicine. Take them 4 hours apart.'],['ciprofloxacin','calcium carbonate','Calcium can block the antibiotic. Take them hours apart.'],['prednisolone','ibuprofen','Together they raise the risk of stomach ulcers and bleeding.'],['prednisolone','diclofenac','Together they raise the risk of stomach ulcers and bleeding.'],['prednisolone','aspirin','Together they raise the risk of stomach ulcers and bleeding.'],['losartan','ibuprofen','Pain killers of this type can weaken blood pressure medicine and harm the kidneys.'],['losartan','diclofenac','Pain killers of this type can weaken blood pressure medicine and harm the kidneys.'],['telmisartan','ibuprofen','Pain killers of this type can weaken blood pressure medicine and harm the kidneys.'],['furosemide','ibuprofen','Pain killers of this type can weaken water tablets and harm the kidneys.']];
+(function(){
+  var D='Store in a cool, dry place below 25°C, away from light and out of reach of children.';
+  MORE.split('\n').forEach(function(l,i){
+    var p=l.split('|');if(p.length<7)return;
+    DB.push({c:'L'+(100+i),n:p[0],g:p[1],b:p[2],m:'Brands: '+p[2],e:'💊',u:p[3],d:p[4],s:p[5],w:p[6],st:D,x:[]});
+    p[2].split(',').forEach(function(b){var k=norm(b);if(k&&!(k in BRAND))BRAND[k]=p[1]});
+  });
+  DB.forEach(function(m){
+    if(m.x.length)return;var seen={};
+    function add(o,n){if(!seen[o]&&o!=m.g){seen[o]=1;m.x.push([o,n])}}
+    GROUPS.forEach(function(g){if(g[0].indexOf(m.g)>-1)g[0].forEach(function(o){add(o,g[1])})});
+    PAIRS.forEach(function(q){if(q[0]==m.g)add(q[1],q[2]);if(q[1]==m.g)add(q[0],q[2])});
+  });
+})();
+
+// ---------- start ----------
+(async function(){
+  var u=sget('ms_session','');var users=sget('ms_users',{});
+  if(!users.demo){users.demo=await hash('demo123');sset('ms_users',users)}
+  enter(u&&users[u]?u:'guest');
+  $('q').addEventListener('keydown',function(e){if(e.key=='Enter')go()});
+  $('pw').addEventListener('keydown',function(e){if(e.key=='Enter')doAuth()});
+})();
+</script>
+</body>
+</html>
