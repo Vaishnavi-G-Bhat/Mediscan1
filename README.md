@@ -415,7 +415,7 @@ Mediscan1/
 
 ## 👥 Team
 
-**Team name:** `[Your Team Name]`
+**Team name:** `FourMinds`
 
 | # | Member name | USN |
 |:-:|---|---|
@@ -424,7 +424,7 @@ Mediscan1/
 | 3 | Shravya NP | 4VP25CS088 |
 | 4 | Shreya K.R | 4VP25CS092 |
 
-**Contact:** `[Team Leader name]` | `[email]` | `[phone]`
+**Contact:** `Sanvi P` | `sanvip611@gmail.com` | `7019085164`
 
 ### 🏫 College
 **Vivekananda College of Engineering and Technology**
