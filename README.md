@@ -419,10 +419,10 @@ Mediscan1/
 
 | # | Member name | USN |
 |:-:|---|---|
-| 1 | Member 1 name (Team Leader) | USN |
-| 2 | Member 2 name | USN |
-| 3 | Member 3 name | USN |
-| 4 | Member 4 name | USN |
+| 1 | Sanvi P (Team Leader) |4VP25CS084 |
+| 2 | Vaishnavi G Bhat | 4VP25CS110  |
+| 3 | Shravya NP | 4VP25CS088 |
+| 4 | Shreya K.R | 4VP25CS092 |
 
 **Contact:** `[Team Leader name]` | `[email]` | `[phone]`
 
